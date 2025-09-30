@@ -8,7 +8,7 @@ This module defines the core database tables:
 """
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
@@ -19,7 +19,7 @@ from app.db.base import Base
 
 def utcnow() -> datetime:
     """Return current UTC datetime."""
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 class Workflow(Base):
@@ -103,7 +103,9 @@ class Run(Base):
     status: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
     current_step: Mapped[str | None] = mapped_column(String(255), nullable=True)
     context: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
-    idempotency_key: Mapped[str | None] = mapped_column(String(255), nullable=True, unique=True, index=True)
+    idempotency_key: Mapped[str | None] = mapped_column(
+        String(255), nullable=True, unique=True, index=True
+    )
     started_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, default=utcnow
     )
@@ -161,4 +163,7 @@ class RunStep(Base):
 
     def __repr__(self) -> str:
         """String representation."""
-        return f"<RunStep(id={self.id}, run_id={self.run_id}, step_id={self.step_id}, status={self.status})>"
+        return (
+            f"<RunStep(id={self.id}, run_id={self.run_id}, "
+            f"step_id={self.step_id}, status={self.status})>"
+        )

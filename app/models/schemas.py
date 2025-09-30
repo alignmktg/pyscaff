@@ -52,9 +52,7 @@ class APICallStepConfig(StepConfig):
     """API call step configuration."""
 
     url: str = Field(..., description="API endpoint URL (supports templating)")
-    method: Literal["GET", "POST", "PUT", "PATCH", "DELETE"] = Field(
-        ..., description="HTTP method"
-    )
+    method: Literal["GET", "POST", "PUT", "PATCH", "DELETE"] = Field(..., description="HTTP method")
     headers: dict[str, str] | None = Field(default=None, description="Request headers")
     body: dict[str, Any] | None = Field(default=None, description="Request body")
     timeout_s: int | None = Field(default=30, description="Request timeout in seconds")

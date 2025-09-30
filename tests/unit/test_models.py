@@ -1,7 +1,7 @@
 """Unit tests for database models and Pydantic schemas."""
 
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime
 
 import pytest
 from sqlalchemy import select
@@ -160,9 +160,7 @@ class TestStepModel:
         await db_session.commit()
 
         # Query all steps
-        result = await db_session.execute(
-            select(Step).where(Step.workflow_id == workflow.id)
-        )
+        result = await db_session.execute(select(Step).where(Step.workflow_id == workflow.id))
         steps = result.scalars().all()
 
         assert len(steps) == 5
@@ -233,7 +231,7 @@ class TestRunModel:
 
         statuses = ["queued", "running", "waiting", "completed", "failed", "canceled"]
 
-        for idx, status in enumerate(statuses):
+        for status in statuses:
             run = Run(
                 id=str(uuid.uuid4()),
                 workflow_id=workflow.id,
@@ -247,9 +245,7 @@ class TestRunModel:
         await db_session.commit()
 
         # Query all runs
-        result = await db_session.execute(
-            select(Run).where(Run.workflow_id == workflow.id)
-        )
+        result = await db_session.execute(select(Run).where(Run.workflow_id == workflow.id))
         runs = result.scalars().all()
 
         assert len(runs) == 6
@@ -295,7 +291,9 @@ class TestRunModel:
         db_session.add(run2)
 
         # Should raise integrity error
-        with pytest.raises(Exception):  # SQLAlchemy will raise IntegrityError
+        from sqlalchemy.exc import IntegrityError
+
+        with pytest.raises(IntegrityError):
             await db_session.commit()
 
 
