@@ -16,6 +16,9 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 # Import the Base class to access metadata
 from app.db.base import Base
 
+# Import all models so Alembic can detect schema changes
+from app.db.models import Run, RunStep, Step, Workflow  # noqa: F401
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
