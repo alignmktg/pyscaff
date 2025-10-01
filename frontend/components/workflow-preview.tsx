@@ -76,7 +76,7 @@ export function WorkflowPreview({ yamlContent }: WorkflowPreviewProps) {
         }))
 
       return { nodes: newNodes, edges: newEdges }
-    } catch (error) {
+    } catch {
       return { nodes: [], edges: [] }
     }
   }, [])
