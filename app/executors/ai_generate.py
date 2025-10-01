@@ -57,8 +57,7 @@ class AIGenerateExecutor:
 
             if value is None:
                 raise ValueError(
-                    f"Variable '{var_name}' not found in context. "
-                    f"Checked: static, profile, runtime"
+                    f"Variable '{var_name}' not found in context. Checked: static, profile, runtime"
                 )
 
             variables[var_name] = value
