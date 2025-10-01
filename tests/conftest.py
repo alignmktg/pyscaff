@@ -36,10 +36,11 @@ async def db_engine() -> AsyncGenerator[Any, None]:
     )
 
     # Import Base and create all tables
-    # This will be uncommented once models are created
-    # from app.db.base import Base
-    # async with engine.begin() as conn:
-    #     await conn.run_sync(Base.metadata.create_all)
+    from app.db.base import Base
+    from app.db.models import Run, RunStep, Step, Workflow  # noqa: F401
+
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
     yield engine
 
@@ -72,9 +73,10 @@ def sync_db_engine() -> Generator[Any, None, None]:
     )
 
     # Import Base and create all tables
-    # This will be uncommented once models are created
-    # from app.db.base import Base
-    # Base.metadata.create_all(bind=engine)
+    from app.db.base import Base
+    from app.db.models import Run, RunStep, Step, Workflow  # noqa: F401
+
+    Base.metadata.create_all(bind=engine)
 
     yield engine
 
