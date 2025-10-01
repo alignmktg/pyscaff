@@ -77,6 +77,7 @@ export function WorkflowPreview({ yamlContent }: WorkflowPreviewProps) {
 
       return { nodes: newNodes, edges: newEdges }
     } catch (error) {
+      console.error("Failed to parse workflow YAML:", error)
       return { nodes: [], edges: [] }
     }
   }, [])

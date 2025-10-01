@@ -1,0 +1,39 @@
+{
+  "name": "Test Workflow",
+  "version": "0.1.0",
+  "start_step": "form_1",
+  "steps": [
+    {
+      "id": "form_1",
+      "type": "form",
+      "name": "Collect User Input",
+      "next": "ai_1",
+      "config": {
+        "fields": [
+          {
+            "key": "name",
+            "type": "string",
+            "required": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "ai_1",
+      "type": "ai_generate",
+      "name": "Generate Response",
+      "next": null,
+      "config": {
+        "template_id": "greeting",
+        "variables": ["name"],
+        "json_schema": {
+          "type": "object",
+          "properties": {
+            "greeting": {"type": "string"}
+          },
+          "required": ["greeting"]
+        }
+      }
+    }
+  ]
+}
