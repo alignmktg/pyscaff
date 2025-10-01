@@ -86,8 +86,8 @@ def sync_db_engine() -> Generator[Any, None, None]:
 @pytest.fixture
 def sync_db_session(sync_db_engine: Any) -> Generator[Session, None, None]:
     """Create sync database session for testing."""
-    SessionLocal = sessionmaker(bind=sync_db_engine)
-    session = SessionLocal()
+    session_local = sessionmaker(bind=sync_db_engine)
+    session = session_local()
 
     yield session
 
