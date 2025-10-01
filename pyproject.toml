@@ -35,6 +35,9 @@ dev = [
 requires = ["setuptools>=68.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools.packages.find]
+include = ["app", "app.*"]
+
 [tool.ruff]
 line-length = 100
 target-version = "py312"
@@ -48,6 +51,10 @@ exclude = [
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP", "B", "C4", "SIM"]
+ignore = [
+    "B008",  # FastAPI uses Depends() in function defaults - this is standard pattern
+    "B904",  # FastAPI exception raising pattern - don't need 'from' for HTTPException
+]
 
 [tool.mypy]
 python_version = "3.12"

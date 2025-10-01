@@ -14,7 +14,14 @@ from app.routers import ai, executions, state, workflows
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """Handle startup and shutdown events."""
-    # Startup logic
+    # Startup logic - create tables if not exists
+    from app.db.base import Base
+    from app.db.models import Run, RunStep, Step, Workflow  # noqa: F401
+    from app.db.session import engine
+
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
     yield
     # Shutdown logic
 
