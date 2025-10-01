@@ -7,15 +7,24 @@
 - Enforces SOTA agentic coding practices (schema-constrained AI, idempotent orchestration, structured telemetry).
 
 ## 1. Scope (MVID)
-- YAML → validated Pydantic models.
-- Executors: form, ai_generate, conditional, api_call, approval.
-- Async orchestrator: idempotent step boundaries, auto-continuation, explicit wait-states.
-- Persistence: Postgres (SQLite dev).
-- APIs: workflow CRUD/validate; executions (start/resume/cancel/status); state (history/context); AI proxy.
-- Observability: OpenTelemetry traces, structured logs, lifecycle events.
+- **Backend**: YAML → validated Pydantic models.
+- **Executors**: form, ai_generate, conditional, api_call, approval.
+- **Orchestrator**: Async, idempotent step boundaries, auto-continuation, explicit wait-states.
+- **Persistence**: PostgreSQL (SQLite dev).
+- **APIs**: workflow CRUD/validate; executions (start/resume/cancel/status); state (history/context); AI proxy.
+- **Observability**: OpenTelemetry traces, structured logs, lifecycle events.
+- **Frontend**: Next.js web app with YAML editor, workflow monitoring, dynamic forms, approval interface.
+- **UI/UX**: Minimalist design system (shadcn/ui), dark mode default, real-time status updates.
 
 ## 2. Out of Scope (Backlog)
-- Visual builder, multi-tenancy, RBAC, SOC 2, connectors marketplace, advanced analytics, A/B testing, scheduling/webhooks, distributed workers, SSO.
+- **Visual drag-drop workflow builder** (MVID uses YAML editor only)
+- Multi-tenancy, RBAC beyond API keys
+- SOC 2 compliance, enterprise security features
+- Connectors marketplace
+- Advanced analytics, A/B testing
+- Workflow scheduling (cron), webhook triggers
+- Distributed workers, horizontal scaling
+- SSO, user management
 
 ## 3. Canonical Definitions
 - Workflow: Named, DAG-like YAML with one start_step.

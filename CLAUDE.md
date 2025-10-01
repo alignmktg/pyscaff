@@ -10,6 +10,7 @@ PyScaff is an AI workflow orchestrator built with Python + FastAPI. This is the 
 
 ## Tech Stack
 
+### Backend
 - **Runtime**: Python 3.12+
 - **Framework**: FastAPI + Uvicorn
 - **Validation**: Pydantic 2.8+
@@ -21,8 +22,21 @@ PyScaff is an AI workflow orchestrator built with Python + FastAPI. This is the 
 - **Linting**: ruff + mypy
 - **AI Provider**: OpenAI (production) / Mock (dev/test)
 
+### Frontend
+- **Framework**: Next.js 15 (App Router) + TypeScript
+- **UI Library**: shadcn/ui + Radix UI primitives
+- **Styling**: Tailwind CSS
+- **Forms**: React Hook Form + Zod validation
+- **State Management**: TanStack Query (server state) + Zustand (client state)
+- **API Client**: Auto-generated from OpenAPI (openapi-typescript-codegen)
+- **YAML Editor**: Monaco Editor
+- **Visualization**: ReactFlow (workflow graphs)
+- **Testing**: Vitest + Playwright + MSW (Mock Service Worker)
+- **Deployment**: Vercel
+
 ## Development Commands
 
+### Backend (Python/FastAPI)
 ```bash
 # Install dependencies (editable mode with dev extras)
 pip install -e ".[dev]"
@@ -63,6 +77,60 @@ make spec-check   # spectral lint openapi.yaml
 make perf         # locust -f tests/perf/locustfile.py
 ```
 
+### Frontend (Next.js)
+```bash
+# Navigate to frontend directory
+cd frontend
+
+# Install dependencies
+npm install
+
+# Generate API client from backend OpenAPI spec
+npm run generate-api
+# OR: npx openapi-typescript-codegen --input http://localhost:8000/openapi.json --output ./lib/api
+
+# Run dev server
+npm run dev  # Starts on http://localhost:3000
+
+# Build for production
+npm run build
+
+# Start production server
+npm start
+
+# Linting & formatting
+npm run lint     # ESLint
+npm run format   # Prettier
+
+# Type checking
+npm run typecheck  # tsc --noEmit
+
+# Testing
+npm test         # Vitest unit tests
+npm run test:e2e # Playwright E2E tests
+npm run test:coverage  # Coverage report
+
+# Install shadcn/ui components
+npx shadcn-ui@latest add button
+npx shadcn-ui@latest add card
+# ... see docs/frontend-spec.md for full list
+```
+
+### Full Stack (Docker)
+```bash
+# Start backend + frontend + database
+docker-compose up
+
+# Backend only
+docker-compose up backend db
+
+# Frontend only (with external backend)
+cd frontend && npm run dev
+
+# Clean restart
+docker-compose down -v && docker-compose up
+```
+
 ## Docker Development
 
 ```bash
@@ -98,8 +166,8 @@ docker-compose down -v && docker-compose up
 ### Directory Structure
 
 ```
-/workflow-orchestrator-py
-  /app
+/pyscaff (monorepo)
+  /app                     # Backend (Python/FastAPI)
     main.py                # FastAPI app entry
     /routers               # API route handlers (workflows, executions, state, ai)
     /models                # Pydantic schemas (Workflow, Run, Step, etc.)
@@ -110,17 +178,50 @@ docker-compose down -v && docker-compose up
       /migrations          # Alembic migration files
         /versions
     /observability         # OpenTelemetry setup, log redaction
-  /tests
+  /tests                   # Backend tests
     /unit                  # Unit tests (executors, models, engine)
     /integration           # API integration tests (workflows, runs)
     /perf                  # Locust load tests
+  /frontend                # Frontend (Next.js)
+    /app                   # Next.js App Router pages
+      layout.tsx
+      page.tsx             # Dashboard
+      /workflows
+        page.tsx           # Workflow list
+        /new/page.tsx      # Create workflow
+        /[id]/page.tsx     # Workflow detail
+        /[id]/edit/page.tsx  # Edit workflow
+      /runs
+        page.tsx           # Run list
+        /[id]/page.tsx     # Run detail
+      /approvals
+        /[token]/page.tsx  # Approval interface
+    /components            # React components
+      /ui                  # shadcn/ui components
+      /workflow            # Workflow-specific components
+      /run                 # Run-specific components
+      /form                # Dynamic form renderer
+    /lib                   # Utils, hooks, API client
+      /api                 # Auto-generated from OpenAPI
+      /utils
+      /hooks
+      /schemas
+    /styles
+      globals.css
+    package.json
+    tsconfig.json
+    tailwind.config.ts
   /.github/workflows       # CI (lint, type, test, audit, spec-check)
   /scripts                 # Seed data, YAML upgrade tools
-  /docs/adr                # Architecture Decision Records
-  pyproject.toml           # Dependencies + tooling config
+  /docs
+    /adr                   # Architecture Decision Records
+    frontend-spec.md       # Frontend specification
+    work-package-wrapups/  # Completion summaries
+  pyproject.toml           # Backend dependencies
   Makefile                 # Dev commands
-  docker-compose.yml       # Local stack
+  docker-compose.yml       # Full stack (backend + frontend + db)
   .env.example             # Environment template
+  README.md
 ```
 
 ### Key Architectural Patterns
@@ -388,6 +489,7 @@ Any change requires synchronized updates to:
 - ADR-003: Minimal executor set for MVID
 - ADR-004: BDD + Storybook required for merge
 - ADR-005: Dual-run parity normalization rules
+- ADR-007: Frontend architecture (Next.js + shadcn/ui)
 
 ## Exit Criteria (Dogfood-Ready)
 
