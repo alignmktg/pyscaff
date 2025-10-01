@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { QueryProvider } from "@/components/query-provider";
+import { MockProvider } from "./mock-provider";
 import { Sidebar } from "@/components/sidebar";
 import { Header } from "@/components/header";
 
@@ -37,17 +38,19 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <QueryProvider>
-            <div className="flex h-screen overflow-hidden">
-              <Sidebar />
-              <div className="flex flex-1 flex-col overflow-hidden">
-                <Header />
-                <main className="flex-1 overflow-y-auto bg-background p-6">
-                  {children}
-                </main>
+          <MockProvider>
+            <QueryProvider>
+              <div className="flex h-screen overflow-hidden">
+                <Sidebar />
+                <div className="flex flex-1 flex-col overflow-hidden">
+                  <Header />
+                  <main className="flex-1 overflow-y-auto bg-background p-6">
+                    {children}
+                  </main>
+                </div>
               </div>
-            </div>
-          </QueryProvider>
+            </QueryProvider>
+          </MockProvider>
         </ThemeProvider>
       </body>
     </html>
