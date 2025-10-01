@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.db.models import Run, RunStep, Workflow
+from app.db.models import Run, Workflow  # noqa: F401 - Workflow used via Run.workflow relationship
 from app.db.session import get_db
 from app.models.schemas import (
     ErrorResponse,

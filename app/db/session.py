@@ -9,9 +9,8 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./app.db")
 
 # Fix SQLite URL for async
-if DATABASE_URL.startswith("sqlite"):
-    if not DATABASE_URL.startswith("sqlite+aiosqlite"):
-        DATABASE_URL = DATABASE_URL.replace("sqlite:", "sqlite+aiosqlite:")
+if DATABASE_URL.startswith("sqlite") and not DATABASE_URL.startswith("sqlite+aiosqlite"):
+    DATABASE_URL = DATABASE_URL.replace("sqlite:", "sqlite+aiosqlite:")
 
 # Create async engine
 engine = create_async_engine(
