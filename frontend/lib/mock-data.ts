@@ -1,4 +1,4 @@
-import { Workflow, Run, RunStep } from "./types"
+import { Workflow, Run, RunStep, ApprovalDetails } from "./types"
 
 export const mockWorkflows: Workflow[] = [
   {
