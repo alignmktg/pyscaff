@@ -26,7 +26,8 @@ class FormExecutor:
             Validated inputs
 
         Raises:
-            ValueError: If validation fails (missing required field, invalid type, unsupported field type)
+            ValueError: If validation fails (missing required field, invalid type,
+                unsupported field type)
         """
         validated = {}
 
@@ -42,7 +43,8 @@ class FormExecutor:
             # Validate field type (text/textarea only for MVID)
             if field.type not in ("text", "textarea"):
                 raise ValueError(
-                    f"Field type '{field.type}' not supported. Only 'text' and 'textarea' are allowed."
+                    f"Field type '{field.type}' not supported. "
+                    "Only 'text' and 'textarea' are allowed."
                 )
 
             # Validate value is string
