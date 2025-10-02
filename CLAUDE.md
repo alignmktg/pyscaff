@@ -20,7 +20,7 @@ PyScaff is an AI workflow orchestrator built with Python + FastAPI. This is the 
 - **Observability**: OpenTelemetry (traces, structured logs)
 - **Testing**: pytest, Locust (perf), schemathesis (contract)
 - **Linting**: ruff + mypy
-- **AI Provider**: OpenAI (production) / Mock (dev/test)
+- **AI Provider**: LiteLLM (multi-provider abstraction supporting OpenAI, Anthropic, etc.) / Mock (dev/test)
 
 ### Frontend
 - **Framework**: Next.js 15 (App Router) + TypeScript
@@ -370,8 +370,10 @@ See `.env.example` for full list:
 
 ```bash
 DATABASE_URL=postgresql+psycopg://app:app@localhost:5432/app  # or sqlite:///./app.db
-AI_PROVIDER=mock                    # mock | openai
-OPENAI_API_KEY=sk-...               # required if AI_PROVIDER=openai
+AI_PROVIDER=mock                    # mock | litellm
+AI_MODEL=gpt-4                      # model for LiteLLM (gpt-4, claude-3-opus-20240229, etc.)
+OPENAI_API_KEY=sk-...               # required for OpenAI models
+ANTHROPIC_API_KEY=sk-ant-...        # required for Anthropic models
 OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
 JWT_SECRET=dev-only-not-for-prod    # use secure random in prod
 LOG_LEVEL=INFO                      # DEBUG | INFO | WARNING | ERROR
@@ -399,13 +401,21 @@ GitHub Actions workflow (`.github/workflows/ci.yml`):
 
 ## Mock AI Provider Modes
 
-Controlled via `MOCK_AI_MODE` env var:
+Controlled via `MOCK_AI_MODE` env var (only when `AI_PROVIDER=mock`):
 - **success**: Returns valid JSON matching schema (default)
 - **schema_violation**: Drops required key; triggers retry logic
 - **timeout**: Sleeps beyond configured timeout
 - **transient_error**: Fails once, succeeds on retry (tests backoff)
 
 Seed determinism: `MOCK_AI_SEED=42` for reproducible outputs.
+
+## LiteLLM Provider (Production)
+
+When `AI_PROVIDER=litellm`, the system uses LiteLLM for unified AI provider abstraction:
+- **Supported models**: OpenAI (gpt-4, gpt-3.5-turbo), Anthropic (claude-3-opus, claude-3-sonnet), and 100+ other providers
+- **Configuration**: Set `AI_MODEL` to specify the model, configure provider-specific API keys (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, etc.)
+- **Structured outputs**: Enforces JSON schema validation for all responses
+- **Automatic retries**: Built-in retry logic for schema violations (up to 2 retries)
 
 ## Security & Redaction
 
@@ -425,7 +435,7 @@ Seed determinism: `MOCK_AI_SEED=42` for reproducible outputs.
 
 1. **Forgetting to run migrations**: `make migrate` before starting API.
 2. **Database connection errors**: Ensure Postgres is running (`docker-compose up db`).
-3. **AI provider not set**: Default is `AI_PROVIDER=mock`; set `OPENAI_API_KEY` for real calls.
+3. **AI provider not set**: Default is `AI_PROVIDER=mock`; set to `litellm` for production and configure `OPENAI_API_KEY` or `ANTHROPIC_API_KEY`.
 4. **Step config validation**: Each step type has strict Pydantic schema; check error messages.
 5. **Idempotency keys**: Must be unique per workflow_id + inputs combo; reuse returns existing run.
 6. **Conditional expressions**: Use sandboxed syntax only (no attribute access, limited functions).
@@ -474,6 +484,16 @@ gh pr create --title "WP-XXX: [Task]" --body "Fixes #123"
 ## Governance
 
 **Single Source of Truth**: `pyscaff-prd.md` (v0.3.0)
+
+**Slash Commands** (Start every session with `/start-session`):
+- `/start-session` - Auto-loads PRD + SESSION-HANDOFF.md + open GitHub issues
+- `/verify-prd` - Validates proposed work against PRD scope before starting
+
+**Work Package Rules:**
+1. **All work must cite PRD sections** - Cite specific sections (e.g., "Per PRD Section 1: Executors...")
+2. **Vertical slices only** - Work packages must span backend + frontend + tests (no layer-scoped work)
+3. **GitHub issues = source of truth** - Work tracked in GitHub, not local markdown
+4. **PRD validation required** - Run `/verify-prd` before starting new work packages
 
 Any change requires synchronized updates to:
 1. PRD (this document)

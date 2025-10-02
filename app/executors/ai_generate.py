@@ -6,6 +6,7 @@ from typing import Any
 from jsonschema import ValidationError, validate
 
 from app.agent.base import AIProvider
+from app.agent.litellm_provider import LiteLLMProvider
 from app.agent.mock import MockAIProvider
 from app.models.schemas import AIGenerateStepConfig
 
@@ -20,16 +21,24 @@ class AIGenerateExecutor:
 
         Args:
             config: AI generate step configuration
-            provider: AI provider instance (defaults to Mock provider)
+            provider: AI provider instance (defaults based on AI_PROVIDER env var)
         """
         self.config = config
         self.provider: AIProvider
 
-        # Use provided provider or create mock based on env
+        # Use provided provider or create based on env
         if provider is None:
-            ai_mode = os.getenv("MOCK_AI_MODE", "success")
-            ai_seed = int(os.getenv("MOCK_AI_SEED", "42"))
-            self.provider = MockAIProvider(mode=ai_mode, seed=ai_seed)
+            ai_provider = os.getenv("AI_PROVIDER", "mock").lower()
+
+            if ai_provider == "mock":
+                # Use mock provider with configurable mode
+                ai_mode = os.getenv("MOCK_AI_MODE", "success")
+                ai_seed = int(os.getenv("MOCK_AI_SEED", "42"))
+                self.provider = MockAIProvider(mode=ai_mode, seed=ai_seed)
+            else:
+                # Use LiteLLM for real AI providers (openai, anthropic, etc.)
+                ai_model = os.getenv("AI_MODEL")
+                self.provider = LiteLLMProvider(model=ai_model)
         else:
             self.provider = provider
 

@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "mcp__sequential-thinking__sequentialthinking"
+      "mcp__sequential-thinking__sequentialthinking",
+      "Bash(awk:*)",
+      "Bash(paste:*)",
+      "Bash(find:*)",
+      "WebSearch"
     ],
     "deny": [],
     "ask": []
