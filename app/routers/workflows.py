@@ -84,7 +84,7 @@ async def create_workflow(
 
     # Create step records
     for step_def in workflow_data.steps:
-        step = Step(
+        db_step = Step(
             workflow_id=workflow_id,
             step_id=step_def.id,
             type=step_def.type,
@@ -92,7 +92,7 @@ async def create_workflow(
             next=step_def.next,
             config=step_def.config,
         )
-        db.add(step)
+        db.add(db_step)
 
     db.add(workflow)
     await db.commit()
@@ -180,9 +180,7 @@ async def update_workflow(
     # Prepare update data
     update_data = workflow_update.model_dump(exclude_unset=True)
     if not update_data:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="No fields to update"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No fields to update")
 
     # Update workflow fields and increment version
     new_definition = existing.definition.copy()
@@ -224,7 +222,7 @@ async def update_workflow(
         await db.execute(delete(Step).where(Step.workflow_id == workflow_id))
 
         for step_def in workflow_update.steps:
-            step = Step(
+            db_step = Step(
                 workflow_id=workflow_id,
                 step_id=step_def.id,
                 type=step_def.type,
@@ -232,7 +230,7 @@ async def update_workflow(
                 next=step_def.next,
                 config=step_def.config,
             )
-            db.add(step)
+            db.add(db_step)
 
         new_definition["steps"] = [step.model_dump() for step in workflow_update.steps]
 
