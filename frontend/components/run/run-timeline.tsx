@@ -3,6 +3,7 @@
 import { RunStep } from "@/lib/types"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Markdown } from "@/components/ui/markdown"
 import {
   CheckCircle2,
   Circle,
@@ -120,9 +121,18 @@ export function RunTimeline({ steps }: RunTimelineProps) {
                         <ChevronRight className="h-3 w-3" />
                         View Output
                       </summary>
-                      <pre className="mt-2 text-xs bg-muted p-3 rounded-md overflow-x-auto">
-                        {JSON.stringify(step.output, null, 2)}
-                      </pre>
+                      <div className="mt-2 bg-muted p-3 rounded-md overflow-x-auto">
+                        {/* Render markdown for AI-generated content, JSON for other outputs */}
+                        {step.type === "ai_generate" && typeof step.output === "object" && "content" in step.output ? (
+                          <Markdown>{String(step.output.content)}</Markdown>
+                        ) : typeof step.output === "string" ? (
+                          <Markdown>{step.output}</Markdown>
+                        ) : (
+                          <pre className="text-xs">
+                            {JSON.stringify(step.output, null, 2)}
+                          </pre>
+                        )}
+                      </div>
                     </details>
                   )}
 

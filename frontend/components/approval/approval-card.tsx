@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Markdown } from "@/components/ui/markdown"
 import type { ApprovalDetails } from "@/lib/types"
 
 interface ApprovalCardProps {
@@ -23,13 +24,22 @@ export function ApprovalCard({ approval }: ApprovalCardProps) {
       <CardContent className="space-y-4">
         <div>
           <h3 className="text-sm font-medium mb-2">Context</h3>
-          <div className="bg-muted rounded-md p-4 space-y-2">
+          <div className="bg-muted rounded-md p-4 space-y-4">
             {Object.entries(approval.context_excerpt).map(([key, value]) => (
-              <div key={key} className="flex justify-between text-sm">
-                <span className="font-medium capitalize">{key.replace(/_/g, " ")}:</span>
-                <span className="text-muted-foreground">
-                  {typeof value === "object" ? JSON.stringify(value) : String(value)}
-                </span>
+              <div key={key} className="space-y-1">
+                <span className="text-sm font-medium capitalize">{key.replace(/_/g, " ")}</span>
+                <div className="text-sm text-muted-foreground">
+                  {typeof value === "string" && value.includes("\n") ? (
+                    // Render multi-line strings as markdown
+                    <Markdown>{value}</Markdown>
+                  ) : typeof value === "object" ? (
+                    <pre className="text-xs overflow-x-auto">
+                      {JSON.stringify(value, null, 2)}
+                    </pre>
+                  ) : (
+                    <span>{String(value)}</span>
+                  )}
+                </div>
               </div>
             ))}
           </div>
