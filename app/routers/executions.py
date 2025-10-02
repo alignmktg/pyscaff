@@ -102,9 +102,7 @@ async def start_execution(
             inputs=run_data.inputs,
             idempotency_key=idempotency_key,
         )
-
-        # Execute first step (might transition to waiting immediately)
-        await engine.execute_step(run.id)
+        # Note: start_run already executes the workflow internally via _execute_workflow
 
     except ValueError as e:
         # Check if it's an idempotency conflict
