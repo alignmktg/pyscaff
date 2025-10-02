@@ -8,10 +8,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import Run, RunStep, Step, Workflow
 from app.executors.ai_generate import AIGenerateExecutor
+from app.executors.approval import ApprovalExecutor
 from app.executors.conditional import ConditionalExecutor
 from app.executors.form import FormExecutor
 from app.models.schemas import (
     AIGenerateStepConfig,
+    ApprovalStepConfig,
     ConditionalStepConfig,
     FormStepConfig,
 )
@@ -110,7 +112,7 @@ class WorkflowEngine:
 
         # Merge new inputs into runtime context and validate
         if inputs:
-            # For form steps, validate inputs before resuming
+            # For form/approval steps, validate inputs before resuming
             if run.current_step:
                 # Fetch workflow to get step definition
                 workflow_result = await self.session.execute(
@@ -129,6 +131,33 @@ class WorkflowEngine:
                         inputs = validated_inputs  # Use validated inputs
 
                         # Move to next step (form completed)
+                        run.current_step = current_step.next
+
+                    # If current step is approval, validate approval decision
+                    elif current_step and current_step.type == "approval":
+                        # Validate approval structure
+                        if "approval" not in inputs:
+                            raise ValueError("Missing 'approval' key in resume data")
+
+                        approval_data = inputs["approval"]
+                        if not isinstance(approval_data, dict):
+                            raise ValueError("Approval data must be a dictionary")
+
+                        if "approved" not in approval_data:
+                            raise ValueError("Missing 'approved' field in approval data")
+
+                        # Store approval decision in context
+                        approval_key = f"{run.current_step}_approval"
+                        if approval_key in run.context["runtime"]:
+                            # Update approval metadata
+                            run.context["runtime"][approval_key]["status"] = (
+                                "approved" if approval_data["approved"] else "rejected"
+                            )
+                            run.context["runtime"][approval_key]["comments"] = approval_data.get(
+                                "comments", ""
+                            )
+
+                        # Move to next step (approval completed)
                         run.current_step = current_step.next
 
             run.context["runtime"].update(inputs)
@@ -298,7 +327,9 @@ class WorkflowEngine:
             raise NotImplementedError("API call executor not yet implemented (WP-006)")
 
         elif step.type == "approval":
-            raise NotImplementedError("Approval executor not yet implemented (WP-007)")
+            approval_config = ApprovalStepConfig(**step.config)
+            approval_executor = ApprovalExecutor(approval_config)
+            return await approval_executor.execute(run.context, step.step_id)
 
         else:
             raise ValueError(f"Unsupported step type: {step.type}")
