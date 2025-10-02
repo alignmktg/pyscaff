@@ -5,9 +5,6 @@ import { workflowsApi } from "@/lib/api-client"
 import { WorkflowCard } from "@/components/workflow-card"
 import { WorkflowListSkeleton } from "@/components/workflow-list-skeleton"
 import { EmptyState } from "@/components/empty-state"
-import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
-import Link from "next/link"
 
 export default function Home() {
   const { data, isLoading, error } = useQuery({
@@ -17,19 +14,11 @@ export default function Home() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Workflows</h1>
-          <p className="text-muted-foreground">
-            Manage and monitor your AI workflows
-          </p>
-        </div>
-        <Link href="/workflows/new">
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Create Workflow
-          </Button>
-        </Link>
+      <div>
+        <h1 className="text-3xl font-bold">Workflows</h1>
+        <p className="text-muted-foreground">
+          Manage and monitor your AI workflows
+        </p>
       </div>
 
       {isLoading && <WorkflowListSkeleton />}
@@ -45,9 +34,7 @@ export default function Home() {
       {data && data.workflows.length === 0 && (
         <EmptyState
           title="No workflows yet"
-          description="Get started by creating your first AI workflow. Define steps, add AI generation, and orchestrate complex processes with ease."
-          actionLabel="Create your first workflow"
-          actionHref="/workflows/new"
+          description="Create workflows by adding YAML files to the /workflows directory in your codebase. Define steps, add AI generation, and orchestrate complex processes."
         />
       )}
 

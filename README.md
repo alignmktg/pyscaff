@@ -80,6 +80,10 @@ docker-compose up db
 docker-compose down -v && docker-compose up
 ```
 
+## Creating Workflows
+
+Workflows are defined as YAML files in your codebase. Create workflows by adding YAML files to the `/workflows` directory. Each workflow should define steps, start_step, and step configurations. See the example workflows in `/scripts/seed_workflows.py` for reference.
+
 ## Documentation
 
 - **[CLAUDE.md](CLAUDE.md)** - Development guide and architecture overview
